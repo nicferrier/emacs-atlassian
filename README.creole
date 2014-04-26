@@ -1,0 +1,19 @@
+confluence editing tool.
+
+=== why?? ===
+
+I use confluence every now and then when I'm working in an enterprise
+company. It's about the best corporate wiki. That bar isn't very high.
+
+I really hate the way they've taken wiki text away and made you use
+HTML as the markup language.
+
+This fixes that problem (by translating the XML back into Wiki) and
+makes editing somewhat trivial.
+
+=== status? ===
+
+Still very experimental right now.
+
+I'd love help!
+
