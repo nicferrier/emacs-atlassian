@@ -96,11 +96,12 @@ PAGE-TEXT is either a string or a buffer."
       (case (car e)
         ((h1 h2 h3) (format "%s. %s\n" (symbol-name (car e)) (elt e 2)))
         (p (cond 
-             ((listp (elt e 2))
+             ((listp (cddr e))
               (concat (atlassian/html->wiki (cddr e) t) "\n"))
              ((equal (elt e 2) " ") "")
              (t
               (concat (elt e 2) "\n"))))
+        (br "\n")
         (ul (concat (atlassian/html->wiki (cddr e)) "\n"))
         (li (format "* %s" (elt e 2)))
         (a (if (elt e 2)
