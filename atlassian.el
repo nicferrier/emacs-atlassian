@@ -167,20 +167,19 @@ The content is stored in `atlassian/edit-content'."
     (read-from-minibuffer
      "Page title: " (car atlassian/edit-page-title-history)
      nil nil 'atlassian/edit-page-title-history)))
-  (with-current-buffer
-      (get-buffer-create (format "*atlassian-%s-%s*" page-space page-title))
-    (erase-buffer)
-    (make-variable-buffer-local 'atlassian/edit-content)
-    (setq atlassian/edit-content
-          (atlassian/call url 'confluence2.getPage page-space page-title))
-    (insert
-     (or ""
-         (atlassian/doc->wiki
-          (let ((content (kva "content" atlassian/edit-content)))
-            (with-temp-buffer
-              (insert content)
-              (libxml-parse-html-region (point-min) (point-max)))))))
-    (switch-to-buffer-other-window (current-buffer))))
+  (let ((content (atlassian/call
+                  url 'confluence2.getPage page-space page-title)))
+    (with-current-buffer
+        (get-buffer-create
+         (format "*atlassian-%s-%s*" page-space page-title))
+      (erase-buffer)
+      (make-variable-buffer-local 'atlassian/edit-content)
+      (setq atlassian/edit-content content)
+      (insert (or (condition-case err
+                      (atlassian/doc->wiki
+                       (atlassian/libxml-wiki (current-buffer)))
+                    (error nil)) ""))
+      (switch-to-buffer-other-window (current-buffer)))))
 
 (defun atlassian/page-url->rpc-url (page-url)
   (let ((url (url-generic-parse-url page-url)))
