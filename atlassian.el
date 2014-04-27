@@ -65,10 +65,16 @@ then authentication is done."
                          (call-interactively 'atlassian/authenticate)))))
         (apply 'xml-rpc-method-call url method-symbol token parameters))
     (error
-     (when (string-match "Call login() to open a new session" (cadr err))
-       ;; Just guess that the error is a session timeout
-       (remhash url atlassian/auth-tokens)
-       (apply 'atlassian/call url method-symbol parameters)))))
+     (let* ((err-thing (cadr err))
+            (err-str (if (stringp err-thing)
+                         err-thing
+                         "unknown error")))
+       (if (string-match "Call login() to open a new session" err-str)
+           (progn
+             ;; Just guess that the error is a session timeout
+             (remhash url atlassian/auth-tokens)
+             (apply 'atlassian/call url method-symbol parameters))
+           (message "whoops! unknown error! %S %S" err parameters))))))
 
 (defun atlassian/convert-wiki (url page-text)
   "Return the HTML text for the PAGE-TEXT being edited.
