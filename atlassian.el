@@ -205,12 +205,12 @@ it has the necessary meta data stored in the page."
          (doc (format
                "<?xml version='1.0'?><html><body>%s</body></html>"
                content)))
+    ;; Show the HTML in another buffer
     (with-current-buffer (get-buffer-create "*confluence-edit*")
       (erase-buffer)
       (insert doc)
       (switch-to-buffer-other-window (current-buffer)))
-    ;; (setcdr (assoc "content" atlassian/edit-content) doc)
-    ;; (setcdr (assoc "content" atlassian/edit-content))
+    ;; Functionally replace the content and limit meta data to relevant
     (atlassian/call
      rpc-url 'confluence2.storePage
      (->> atlassian/edit-content
