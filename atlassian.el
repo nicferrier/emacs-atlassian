@@ -194,20 +194,28 @@ The content is stored in `atlassian/edit-content'."
   (interactive (list (current-buffer)))
   (let* ((rpc-url (atlassian/page-url->rpc-url
                    (kva "url" atlassian/edit-content)))
-         (content (atlassian/convert-wiki
-                   rpc-url
-                   (with-current-buffer page-buffer
-                     (buffer-substring-no-properties
-                      (point-min) (point-max)))))
-         (doc (format "<html><body>%s</body></html>" content)))
-    (setcdr (assoc "content" atlassian/edit-content) doc)
+         (wiki-text (with-current-buffer page-buffer
+                      (buffer-substring-no-properties
+                       (point-min) (point-max))))
+         (content (atlassian/convert-wiki rpc-url wiki-text))
+         (doc (format
+               "<?xml version='1.0'?><html><body>%s</body></html>"
+               content)))
+    (with-current-buffer (get-buffer-create "*confluence-edit*")
+      (erase-buffer)
+      (insert doc)
+      (switch-to-buffer-other-window (current-buffer)))
+    ;; (setcdr (assoc "content" atlassian/edit-content) doc)
+    ;; (setcdr (assoc "content" atlassian/edit-content))
     (atlassian/call
      rpc-url 'confluence2.storePage
-     (--filter
-      (member (car it) atlassian/update-keys)
-      atlassian/edit-content))
-    (message content)))
-
+     (->> atlassian/edit-content
+       (--filter (member (car it) atlassian/update-keys))
+       (--keep (if (equal (car it) "content")
+                   ;;(cons "content" wiki-text)
+                   (cons "content" doc)
+                   it))))))
 
 (provide 'atlassian)
+
 ;;; atlassian.el ends here
