@@ -64,10 +64,11 @@ then authentication is done."
                        (let ((atlassian-url url))
                          (call-interactively 'atlassian/authenticate)))))
         (apply 'xml-rpc-method-call url method-symbol token parameters))
-    (atlassian-session-error
-     ;; Just guess that the error is a session timeout
-     (remhash url atlassian/auth-tokens)
-     (apply 'atlassian/call url method-symbol parameters))))
+    (error
+     (when (string-match "Call login() to open a new session" (cadr err))
+       ;; Just guess that the error is a session timeout
+       (remhash url atlassian/auth-tokens)
+       (apply 'atlassian/call url method-symbol parameters)))))
 
 (defun atlassian/convert-wiki (url page-text)
   "Return the HTML text for the PAGE-TEXT being edited.
