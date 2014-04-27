@@ -116,6 +116,13 @@ PAGE-TEXT is either a string or a buffer."
   "Convert a confluence DOC to Wiki text.
 
 DOC is a list created by `libxml-parse-xml'."
+  (interactive
+   (list (let ((sexp (condition-case err 
+                         (save-excursion
+                           (goto-char (point-min))
+                           (read (current-buffer)))
+                       (error nil))))
+           (if (listp sexp) sexp (error "no document")))))
   (atlassian/html->wiki (cddr (elt doc 2))))
 
 
