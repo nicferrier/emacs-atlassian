@@ -138,7 +138,24 @@ DOC is a list created by `libxml-parse-xml'."
 (defvar atlassian/edit-content nil
   "Buffer local content string")
 
+(defun atlassian/lixbml-parse-string (str)
+  (with-temp-buffer
+    (insert str)
+    (libxml-parse-html-region (point-min) (point-max))))
+
+(defun atlassian/libxml-wiki (buffer &optional debug)
+  "`libxml-parse-xml-region' the content in the BUFFER.
+
+The content is stored in `atlassian/edit-content'."
+  (interactive (list (current-buffer) t))
+  (let ((parsed
+         (with-current-buffer buffer
+           (let ((content (kva "content" atlassian/edit-content)))
+             (atlassian/libxml-parse-string content)))))
+    parsed))
+
 (defun atlassian-edit (url page-space page-title)
+  "Edit the page in URL with PAGE-SPACE and PAGE-TITLE."
   (interactive
    (list
     (read-from-minibuffer
