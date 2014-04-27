@@ -191,6 +191,10 @@ The content is stored in `atlassian/edit-content'."
   "The keys that are required in the store page alist when updating.")
 
 (defun atlassian/store-page (page-buffer)
+  "Store the page in PAGE-BUFFER.
+
+PAGE-BUFFER must be a buffer created by `atlassian-edit' so that
+it has the necessary meta data stored in the page."
   (interactive (list (current-buffer)))
   (let* ((rpc-url (atlassian/page-url->rpc-url
                    (kva "url" atlassian/edit-content)))
